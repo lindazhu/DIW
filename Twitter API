@@ -1,0 +1,52 @@
+#https://dev.twitter.com/docs/auth/obtaining-access-tokens
+
+
+
+library(RCurl)
+options(RCurlOptions = list(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
+library(twitteR)
+library(ROAuth)
+
+
+requestURL <- "https://api.twitter.com/oauth/request_token"
+accessURL = "http://api.twitter.com/oauth/access_token"
+authURL = "http://api.twitter.com/oauth/authorize"
+consumerKey = "consumerKey"
+consumerSecret = "consumerSecret"
+twitCred <- OAuthFactory$new(consumerKey=consumerKey,
+                             consumerSecret=consumerSecret,
+                             requestURL=requestURL,
+                             accessURL=accessURL, 
+                             authURL=authURL)
+#URL in browser eingeben und PIN eingeben:
+twitCred$handshake(cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl") ) 
+
+
+#authorisiert?
+registerTwitterOAuth(twitCred)
+
+#oder mit:
+#getTwitterOAuth("consumerKey", "consumerSecret")
+
+
+?searchTwitter
+searchTwitter('#twitterapi', n=10)
+
+
+#http://api.twitter.com/oauth/authorize?oauth_token=QqEWews40HrvSru80CHcnpfQdhwkpifJdqGEitJnk
+
+
+#Friends, follower, IDs auflisten
+user <- getUser("Twittername")
+user$getFriends()
+user$getFriendIDs()
+user$getFollowerIDs()
+
+
+#timeline
+ut <- userTimeline("barackobama", n=10)
+
+
+#umwandeln in data.frame
+zz <- searchTwitter("#rstats")
+twListToDF(zz)
