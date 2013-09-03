@@ -1,0 +1,97 @@
+####read dta data ####
+data <- function(dataPath){
+  library("foreign")
+  x <- read.dta(dataPath)
+  return(x)
+}
+data("C:/Users/Lzhu/school.dta")
+
+#### numeric/ integer #########
+statNumeric <- function(variable, varName){
+  listNumeric <- list(name = varName,
+                      class = class(variable),
+                      valid = sum(is.na(variable)),
+                      invalid = sum(!is.na(variable)),
+                      mean = mean(variable, na.rm=T),
+                      var = var(variable, na.rm=T),
+                      quantile = quantile(variable, na.rm=T),
+                      min = min(variable, na.rm=T),
+                      max = max(variable, na.rm=T))
+  class(listNumeric) <- "statNumeric"
+  listNumeric
+}
+
+print.statNumeric <- function(x){
+  cat("name:\n", x$name,
+      "\n\nclass:\n", x$class, 
+      "\n\nvalid:\n", x$valid, 
+      "\n\ninvalid:\n", x$invalid, 
+      "\n\nmean:\n", x$mean, 
+      "\n\nvariance:\n", x$var,
+      "\n\nquantile:\n")
+  print(x$quantile)
+  cat("\n\nmin:\n", x$min, 
+      "\n\nmax:\n", x$max, "\n\n")
+}
+
+##### factor ############
+statFactor <- function(variable, varName){
+  listFactor <- list(name = varName,
+                      class = class(variable),
+                     table = table(variable))
+  class(listFactor) <- "statFactor"
+  listFactor
+}
+
+print.statFactor <- function(x){
+  cat("name:\n", x$name,
+    "\n\nclass:\n", x$class, 
+      "\n\nfrequency:\n")
+  print(x$table)
+  cat("\n\n")
+}
+
+#########class ############
+class1 <- function(dataPath){
+  class1 <- sapply(data(dataPath), class)
+  return(class1)
+}
+class1("C:/Users/Lzhu/school.dta")
+
+####### all variables ########
+allVariables <- function(dataPath){
+  dat <- data(dataPath)
+  z <- list()
+  for(variable in names(dat)){  
+    if(class1(dataPath)[[variable]]=="integer"| class1(dataPath)[[variable]] == "numeric"){
+      z[[variable]] <- statNumeric(dat[,variable], variable)  
+    } else if(class1(dataPath)[[variable]]=="factor"){
+      z[[variable]] <- statFactor(dat[,variable], variable) 
+    }
+  }
+  class(z) <- "allVariables"
+  z
+}
+allVariables("C:/Users/Lzhu/school.dta")
+
+####
+print.allVariables <- function(x){
+  for(i in x){
+    print(i)
+  }
+}
+allVariables("C:/Users/Lzhu/school.dta")
+
+########## codebook #######
+codebook <- function(dataPath, variable=NULL){
+  dat <- data(dataPath)
+  if(is.null(variable)==TRUE){
+    all <- allVariables(dataPath)
+  } else if(is.null(variable)==FALSE)
+    if(class1(dataPath)[[variable]]=="integer"| class1(dataPath)[[variable]] == "numeric"){
+      numericVar <- statNumeric(dat[,variable])
+    } else if(class1(dataPath)[[variable]]=="factor"){
+      factorVar <- statFactor(dat[,variable])
+    }    
+}
+codebook("C:/Users/Lzhu/school.dta")
