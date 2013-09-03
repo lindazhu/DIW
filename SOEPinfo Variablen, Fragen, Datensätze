@@ -1,0 +1,88 @@
+library("RJSONIO")
+library("RCurl")
+
+
+# Variable auswählen: 
+
+getVariable <- function(variable, study, dataset){
+  x <- fromJSON(getURL(paste("http://ddionrails.soep.de/api/variable.json?variable=", variable, "&study=", study, "&dataset=", dataset, sep=""), userpwd="guest:panel"))
+  class(x) <- "variable"
+  x
+}
+
+print.categories <- function(x){
+  cat("\n\nvalue:\n", x$value,
+      "\n\nlabel:\n", x$label, 
+      "\n\nfrequency:\n", x$frequency)
+}
+
+
+print.variable <- function(x){
+  cat("name:\n", x$name,
+      "\n\nclass:\n", x$class, 
+      "\n\nlabel:\n", x$label, 
+      "\n\nstudy id:\n", x$study_id, 
+      "\n\ndataset id:\n", x$dataset_id, 
+      "\n\nquestion id:\n", x$question_id)
+      lapply(x$categories, print.categories)
+}
+
+getVariable("bah01", "core", "bah")
+
+
+
+
+# Fragenummer auswählen:
+
+getQuestion <- function(questionNumber){
+  x <- fromJSON(getURL(paste("http://ddionrails.soep.de/questions/", questionNumber, ".json", sep=""), userpwd="guest:panel"))
+  class(x) <- "question"
+  x
+}
+
+print.question <- function(x){
+  cat("concept id:\n", x$concept_id,
+      "\n\ncreated at:\n", x$created_at, 
+      "\n\ndescription:\n", x$description, 
+      "\n\nid:\n", x$id, 
+      "\n\nlabel:\n", x$label, 
+      "\n\nlft:\n", x$lft,
+      "\n\nname:\n", x$name,
+      "\n\nnumber:\n", x$number,
+      "\n\nquestionnaire id:\n", x$questionnaire_id,
+      "\n\nrgt:\n", x$rgt,
+      "\n\nsort id:\n", x$sort_id,
+      "\n\nupdated at:\n", x$updated_at)
+}
+
+
+getQuestion("2201")
+
+
+# Datensatz auswählen:
+
+getDataset <- function(datasetNumber){
+  x <- fromJSON(getURL(paste("http://ddionrails.soep.de/datasets/", datasetNumber, ".json", sep=""), userpwd="guest:panel"))
+  class(x) <- "dataset"
+  x
+}
+
+
+print.variableInDataset <- function(x){
+  cat("\n\ncreated at:\n", x$created_at,
+      "\n\ndataset id:\n", x$dataset_id,
+      "\n\ndescription:\n", x$description, 
+      "\n\nformat:\n", x$format, 
+      "\n\nid:\n", x$id, 
+      "\n\nlabel:\n", x$label, 
+      "\n\nlogical variable id", x$logical_variable_id,
+      "\n\nname:\n", x$name,
+      "\n\nupdated at:\n", x$updated_at)
+}
+  
+print.dataset <- function(x){
+  lapply(x$variables, print.variableInDataset)
+}
+
+getDataset("10")
+
